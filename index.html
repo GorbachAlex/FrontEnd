@@ -1,0 +1,213 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN">
+<html>
+<head>
+    <meta charset="utf-8" http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Autorization</title>
+    <script src="jquery/jquery.min.js"></script>
+
+<style>
+
+body {
+	background-color: #ddd;
+	text-align: center;
+}
+
+#content {
+	width: 1000px;
+	padding: 20px;
+	background-color:#eee;
+	margin: 10px auto;
+	font-size: 18px;
+	font-family: Tahoma, Geneva, sans-serif;
+}
+	
+	/* общий див для вывода в него всей таблицы */
+#auth_result_table {
+	width: 900px;
+	font-size: .9rem;
+	letter-spacing: 1px;
+	padding: 3px;
+	border: solid 2px #A9A9A9; 
+	margin: 5px;
+}
+	
+	/* див для вывода в него строки таблицы */
+#auth_result_table div {
+	margin: 1px;
+}
+#auth_result_table div * {
+/*	border: solid 1px #708090; */
+	margin: 0px 1px 6px 1px;
+	padding: 2px 15px;
+	display: inline-block;
+}	
+	
+/* Спанчики в таблице вывода*/
+#auth_result_table  .long1 {
+	width: 150px;
+}	
+#auth_result_table .long2 {
+	width: 250px;
+}
+#auth_result_table .long3 {
+	width: 125px;
+}
+/* отдельные короткие спанчики в таблице*/
+#auth_result_table .short1 {
+   width: 25px;
+   margin: 1px;
+   text-align:center;
+}
+#auth_result_table .but {
+   opacity: 0.9;
+   filter (opacity: 90%)
+}
+#auth_result_table img {
+   margin: 1px 2px;
+   text-align:center;
+	cursor: pointer;
+}
+#auth_result_table .but img.accept {
+	display: none;
+}
+#auth_result_table #add img.accept {
+	display: inline-block;
+}
+	
+/* четные спанчики в таблице*/
+#auth_result_table div:nth-child(even)  {background: #D3D3D3}
+/* нечетные спанчики в таблице*/
+#auth_result_table div:nth-child(odd) {background: #A9A9A9}
+/* спанчики в таблице при наведении*/
+#auth_result_table div:hover {
+		background: #607d8b;
+		color: 	#F0F8FF;
+ }
+ 
+/* Пoдлoжкa */
+#overlay {
+	z-index:3; /* пoдлoжкa дoлжнa быть выше слoев элементoв сaйтa, нo ниже слoя мoдaльнoгo oкнa */
+	position:fixed; /* всегдa перекрывaет весь сaйт */
+	background-color:#000; /* чернaя */
+	opacity:0.8; /* нo немнoгo прoзрaчнa */
+	-moz-opacity:0.8; /* фикс прозрачности для старых браузеров */
+	filter:alpha(opacity=80);
+	width:100%; 
+	height:100%; /* рaзмерoм вo весь экрaн */
+	top:0; /* сверху и слевa 0, oбязaтельные свoйствa! */
+	left:0;
+	cursor:pointer;
+	display:none; /* в oбычнoм сoстoянии её нет) */
+}
+
+#confirm_form {
+	width: 200px; 
+	height: 50px; /* Рaзмеры дoлжны быть фиксирoвaны */
+	border-radius: 5px;
+	border: 3px #000 solid;
+	background: #fff;
+	position: fixed; /* чтoбы oкнo былo в видимoй зoне в любoм месте */
+	top: 50%; /* oтступaем сверху 45%, oстaльные 5% пoдвинет скрипт */
+	left: 50%; /* пoлoвинa экрaнa слевa */
+	margin-top: -150px;
+	margin-left: -150px; /* тут вся мaгия центрoвки css, oтступaем влевo и вверх минус пoлoвину ширины и высoты сooтветственнo =) */
+	display: none; /* в oбычнoм сoстoянии oкнa не дoлжнo быть */
+	opacity: 0; /* пoлнoстью прoзрaчнo для aнимирoвaния */
+	z-index: 5; /* oкнo дoлжнo быть нaибoлее бoльшем слoе */
+	padding: 20px 10px;
+} 
+ 
+.confirmbutton {
+  font-family: arial;
+  font-weight: bold;
+  color: #14396A !important;
+  font-size: 20px;
+  text-shadow: 1px 1px 0px #7CACDE;
+  box-shadow: 1px 1px 1px #BEE2F9;
+  padding: 10px 10px;
+  -moz-border-radius: 8px;
+  -webkit-border-radius: 8px;
+  border-radius: 8px;
+  border: 2px solid #3866A3;
+  background: #63B8EE;
+  background: linear-gradient(top,  #63B8EE,  #468CCF);
+  background: -ms-linear-gradient(top,  #63B8EE,  #468CCF);
+  background: -webkit-gradient(linear, left top, left bottom, from(#63B8EE), to(#468CCF));
+  background: -moz-linear-gradient(top,  #63B8EE,  #468CCF);
+}
+.confirmbutton:hover {
+  color: #14396A !important;
+  background: #468CCF;
+  background: linear-gradient(top,  #468CCF,  #63B8EE);
+  background: -ms-linear-gradient(top,  #468CCF,  #63B8EE);
+  background: -webkit-gradient(linear, left top, left bottom, from(#468CCF), to(#63B8EE));
+  background: -moz-linear-gradient(top,  #468CCF,  #63B8EE);
+} 
+ 
+ 
+</style>
+<script >
+
+$(document).ready(function(){
+	
+	$("#auth_result_table").load('/auth/read_table.php');
+
+
+	<!-- ADD USER -->
+	$('#btn_add').click(function() { 
+		
+			var form_authdata = $('#modal_authformserver').serialize(); 
+			$.ajax({
+				type: "POST", 
+				async: false,
+				cache: false,
+				url: "/auth/auth_reg.php", 
+				data: form_authdata,
+				success: function() {
+                    $("#auth_result_msg").html('<p>Registration completed!</p>');
+					$('#auth_main').hide(1000); 
+				}
+			});
+		
+	});
+
+
+
+	
+});
+
+</script>
+
+</head>
+<body>
+
+<div id="content">
+  
+    <!-- Общая ошибка -->
+    <div id="auth_result_msg"></div>
+    
+    <!-- Основная таблица -->
+    <div id="auth_result_table"></div>
+    
+    <!------------------------------------------------------------------------------------------------------->
+<div id="confirm_form"><!-- Сaмo oкнo --> 
+      
+      <!---->
+	  <form id="modal_authformserver" action="">  
+	  	  
+	  <div>
+	  <button class="confirmbutton" type="button" id="btn_ok">OK</button>
+	  <button class="confirmbutton" type="button" id="btn_cancel">Cancel</button>
+	  </div>
+	 
+	 </form>
+</div>
+
+<!-- Пустая Пoдлoжкa -->
+<div id="overlay"></div>
+  
+</div>    
+
+
+</body>
+</html>
